@@ -35,7 +35,6 @@ class PowershellSpec
   var stderr: Gobbler      = _
 
   before {
-
     config = ConfigGenerator.generate(PowerShell)
     startDirectory = Files.createTempDirectory(null)
 
