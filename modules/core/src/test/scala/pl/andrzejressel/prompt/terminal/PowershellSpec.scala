@@ -79,7 +79,7 @@ class PowershellSpec
     val initialEnvEvent = consoleEvents
       .collectFirst { case x: SetEnvironment => x }
 
-    initialDirEvent.value.dir shouldBe this.startDirectory.toFile.getAbsolutePath
+    initialDirEvent.value.dir shouldBe this.startDirectory
     initialEnvEvent.value.env should contain(ci"os" -> "Windows_NT")
 
   }

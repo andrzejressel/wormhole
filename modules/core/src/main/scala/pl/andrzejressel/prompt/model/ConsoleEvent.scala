@@ -5,6 +5,9 @@ import io.circe.generic.extras.Configuration
 import io.circe.generic.extras.semiauto._
 import org.typelevel.ci.CIString
 import pl.andrzejressel.prompt.interop.CaseInsensitive._
+import pl.andrzejressel.prompt.interop.Java._
+
+import java.nio.file.Path
 
 sealed trait ConsoleEvent {}
 
@@ -21,5 +24,5 @@ object ConsoleEvent {
 }
 
 case class NewConsole(pid: Int)                       extends ConsoleEvent
-case class ChangeDir(dir: String)                     extends ConsoleEvent
+case class ChangeDir(dir: Path)                       extends ConsoleEvent
 case class SetEnvironment(env: Map[CIString, String]) extends ConsoleEvent
