@@ -13,5 +13,7 @@ object Main {
         .mkString
     )
 
+    println("Resource test ended successfully")
+
   }
 }
