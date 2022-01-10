@@ -10,12 +10,21 @@ import pl.andrzejressel.prompt.utils.FS2Utils.{
   shareAndCombine
 }
 
+import java.util.concurrent.Executors
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
-class FS2UtilsSpec extends AsyncFreeSpec with should.Matchers with AsyncIOSpec {
+class FS2UtilsSpec
+    extends AsyncFreeSpec
+    with should.Matchers
+    with AsyncIOSpec
+    with PromptEventually {
+
+  override implicit def executionContext: ExecutionContext =
+    ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
 
   "prefetchKeepLatest" - {
-    "should drop buffered elements" in {
+    "should drop buffered elements" in eventually {
       fs2
         .Stream[IO, Int](1, 2, 3, 4)
         .evalMap(i => IO.sleep(30.milliseconds) >> IO(i))
@@ -28,7 +37,7 @@ class FS2UtilsSpec extends AsyncFreeSpec with should.Matchers with AsyncIOSpec {
   }
 
   "shareAndCombine" - {
-    "fast pipes does not wait for slow ones" in {
+    "fast pipes does not wait for slow ones" in eventually {
       def fastPipe[I]: Pipe[IO, I, Option[I]] =
         src => src.evalMap(a => IO.sleep(30.milliseconds) >> IO(Some(a)))
 
