@@ -47,7 +47,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Run tests
-        run: sbt nativeImage && modules/resource_test/target/native-image/resource_test
+        run: sbt nativeImage
 
   lint:
     runs-on: ubuntu-latest
