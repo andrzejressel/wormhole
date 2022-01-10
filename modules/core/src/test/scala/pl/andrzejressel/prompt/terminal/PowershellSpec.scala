@@ -35,7 +35,6 @@ class PowershellSpec
   var stderr: Gobbler      = _
 
   before {
-
     config = ConfigGenerator.generate(PowerShell)
     startDirectory = Files.createTempDirectory(null)
 
@@ -80,7 +79,7 @@ class PowershellSpec
     val initialEnvEvent = consoleEvents
       .collectFirst { case x: SetEnvironment => x }
 
-    initialDirEvent.value.dir shouldBe this.startDirectory.toString
+    initialDirEvent.value.dir.expand() shouldBe this.startDirectory.expand()
     initialEnvEvent.value.env should contain(ci"os" -> "Windows_NT")
 
   }

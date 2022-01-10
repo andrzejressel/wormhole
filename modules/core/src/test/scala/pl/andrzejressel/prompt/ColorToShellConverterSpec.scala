@@ -2,7 +2,6 @@ package pl.andrzejressel.prompt
 
 import eu.timepit.refined.scalacheck.numeric._
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
@@ -52,7 +51,7 @@ class ColorToShellConverterSpec
       (r: EightBitNumber, g: EightBitNumber, b: EightBitNumber) => {
         val color      = RGBColor(r, g, b)
         val escapeCode = ColorToShellConverter.getBackgroundEscapeCode(color)
-        escapeCode shouldBe f"\u001B[48;2;${r};${g};${b}m"
+        escapeCode shouldBe f"\u001B[48;2;$r;$g;${b}m"
       }
     )
   }

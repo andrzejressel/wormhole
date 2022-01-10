@@ -21,7 +21,7 @@ class PowershellBackupSpec
     with WindowsOnly
     with PromptEventually {
 
-  it should "work" in {
+  ignore should "work" in {
 
     val cmd     = Array("powershell")
     val env     = System.getenv.asScala.toMap
@@ -43,7 +43,7 @@ class PowershellBackupSpec
 
   }
 
-  it should "work2" in {
+  ignore should "work2" in {
 
     val cmd     = Array("powershell")
     val env     = System.getenv.asScala.toMap
@@ -67,7 +67,7 @@ class PowershellBackupSpec
 
   }
 
-  it should "work3" in {
+  ignore should "work3" in {
 
     val config = ConfigGenerator.generate(PowerShell)
 
