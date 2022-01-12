@@ -47,9 +47,9 @@ lazy val core = (project in file("modules/core"))
   .settings(
     commonSettings,
     nativeImageSettings,
-    name                := "core",
-    libraryDependencies := Dependencies.all,
-    mainClass           := Some("pl.andrzejressel.prompt.Main")
+    name      := "core",
+    libraryDependencies ++= Dependencies.all,
+    mainClass := Some("pl.andrzejressel.prompt.Main")
   )
 
 lazy val dsl = (project in file("modules/dsl"))
