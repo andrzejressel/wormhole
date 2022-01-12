@@ -37,7 +37,6 @@ jobs:
       with:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: "modules/core/target/scala-2.13/coverage-report/cobertura.xml"
-      if: ${{ secrets.CODACY_PROJECT_TOKEN != '' }}
 
   native_image:
     strategy:
