@@ -94,17 +94,26 @@ object Dependencies {
     "com.github.valskalla" %% "odin-extras" // to enable additional features if needed (see docs)
   ).map(_ % "0.13.0")
 
-  private val caseInsensitive = "org.typelevel"      %% "case-insensitive" % "1.2.0"
-  private val pty4j           = "org.jetbrains.pty4j" % "pty4j"            % "0.12.7" % Test
+  private object Pty4J {
+    private val pty4j = "org.jetbrains.pty4j" % "pty4j" % "0.12.7"
+    private val guava = "com.google.guava"    % "guava" % "30.1.1-jre"
+    private val log4j =
+      "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.1"
+
+    val all: Seq[ModuleID] = Seq(pty4j, guava, log4j).map(_ % Test)
+  }
+
+  private val caseInsensitive = "org.typelevel" %% "case-insensitive" % "1.2.0"
 
   val all: Seq[ModuleID] =
-    Seq(enumeratum, caseInsensitive, pty4j) ++
+    Seq(enumeratum, caseInsensitive) ++
       FS2.all ++
       Cats.all ++
       Circe.all ++
       Refined.all ++
       ApacheCommons.all ++
       ScalaTest.all ++
-      odin
+      odin ++
+      Pty4J.all
 
 }
