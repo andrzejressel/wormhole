@@ -6,7 +6,7 @@ import cats.implicits.catsSyntaxOptionId
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
 import pl.andrzejressel.prompt.model.AnsiColor.Black
-import pl.andrzejressel.prompt.model.{Color, ConsoleState, Segment}
+import pl.andrzejressel.prompt.model.{ConsoleState, Segment}
 import pl.andrzejressel.prompt.utils.PromptEventually
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -32,10 +32,6 @@ class FunctionModuleSpec
         createSegmentInvocations.incrementAndGet()
         None
       }
-
-      override protected def textColor: Color = Black
-
-      override protected def backgroundColor: Color = Black
     }
 
     for {
@@ -64,12 +60,8 @@ class FunctionModuleSpec
     val module = new FunctionModule {
       override def createSegment(state: ConsoleState): Option[Segment] = {
         createSegmentInvocations.incrementAndGet()
-        Segment((state.pid.get % 2).toString, textColor, backgroundColor).some
+        Segment((state.pid.get % 2).toString, Black, Black).some
       }
-
-      override protected def textColor: Color = Black
-
-      override protected def backgroundColor: Color = Black
     }
 
     for {
