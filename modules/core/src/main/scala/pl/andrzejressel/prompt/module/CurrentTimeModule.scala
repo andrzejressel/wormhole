@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 
 case class CurrentTimeModule(
-  override val textColor: Color,
-  override val backgroundColor: Color,
+  textColor: Color,
+  backgroundColor: Color,
   pattern: String = "yyyy-MM-dd HH:mm:ss"
 ) extends Module {
 

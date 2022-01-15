@@ -18,7 +18,7 @@ object ColorToShellConverter {
 
   sealed trait Modifier extends EnumEntry
   object Modifier       extends Enum[Modifier] {
-    val values = findValues
+    val values: IndexedSeq[Modifier] = findValues
 
     case object BACKGROUND extends Modifier
     case object FOREGROUND extends Modifier
@@ -45,25 +45,25 @@ object ColorToShellConverter {
 
   def getColorCode(modifier: Modifier, color: Color): String = {
     color match {
-      case c: EightBitColor => _getColorCode(modifier, c)
-      case c: RGBColor      => _getColorCode(modifier, c)
-      case c: BrightColor   => _getColorCode(modifier, c)
-      case c: AnsiColor     => _getColorCode(modifier, c)
+      case c: EightBitColor => getColorCode(modifier, c)
+      case c: RGBColor      => getColorCode(modifier, c)
+      case c: BrightColor   => getColorCode(modifier, c)
+      case c: AnsiColor     => getColorCode(modifier, c)
     }
   }
 
-  private def _getColorCode(
+  private def getColorCode(
     modifier: Modifier,
     color: EightBitColor
   ): String = {
     val modifierNumber = modifier match {
-      case BACKGROUND => 48
       case FOREGROUND => 38
+      case BACKGROUND => 48
     }
     f"$MAGIC_CODE[$modifierNumber;5;${color.color}m"
   }
 
-  private def _getColorCode(modifier: Modifier, color: RGBColor): String = {
+  private def getColorCode(modifier: Modifier, color: RGBColor): String = {
     val modifierNumber = modifier match {
       case FOREGROUND => 38
       case BACKGROUND => 48
@@ -71,20 +71,25 @@ object ColorToShellConverter {
     f"$MAGIC_CODE[$modifierNumber;2;${color.r};${color.g};${color.b}m"
   }
 
-  private def _getColorCode(modifier: Modifier, color: AnsiColor): String = {
-    var colorNumber = colorToCodeMap(color)
-    if (modifier == Modifier.BACKGROUND) {
-      colorNumber += 10
-    }
+  private def getColorCode(modifier: Modifier, color: AnsiColor): String = {
+    val colorNumber = getAnsiColorNumber(color, modifier)
     f"$MAGIC_CODE[${colorNumber}m"
   }
 
-  private def _getColorCode(modifier: Modifier, color: BrightColor): String = {
-    var colorNumber = colorToCodeMap(color.ansiColor)
-    if (modifier == Modifier.BACKGROUND) {
-      colorNumber += 10
-    }
+  private def getColorCode(modifier: Modifier, color: BrightColor): String = {
+    val colorNumber = getAnsiColorNumber(color.ansiColor, modifier)
     f"$MAGIC_CODE[1;${colorNumber}m"
+  }
+
+  private def getAnsiColorNumber(
+    ansiColor: AnsiColor,
+    modifier: Modifier
+  ): Int = {
+    val modifierNumber: Int = modifier match {
+      case Modifier.BACKGROUND => 10
+      case _                   => 0
+    }
+    colorToCodeMap(ansiColor) + modifierNumber
   }
 
 }

@@ -36,36 +36,27 @@ val nativeImageSettings = Seq(
 )
 
 lazy val root = (project in file("."))
-  .aggregate(core, dsl, macros, resourceTest)
+  .aggregate(core, example, resourceTest)
   .settings(
     name := "prompt"
   )
 
 lazy val core = (project in file("modules/core"))
   .enablePlugins(NativeImagePlugin)
-  .dependsOn(macros)
   .settings(
     commonSettings,
-    nativeImageSettings,
-    name      := "core",
-    libraryDependencies ++= Dependencies.all,
-    mainClass := Some("pl.andrzejressel.prompt.Main")
+    name := "core",
+    libraryDependencies ++= Dependencies.all
   )
 
-lazy val dsl = (project in file("modules/dsl"))
+lazy val example = (project in file("modules/example"))
+  .enablePlugins(NativeImagePlugin)
   .dependsOn(core)
   .settings(
     commonSettings,
-    name := "dsl"
-  )
-
-lazy val macros = (project in file("modules/macros"))
-  .settings(
-    commonSettings,
-    libraryDependencies += scalaVersion(
-      "org.scala-lang" % "scala-reflect" % _
-    ).value,
-    name := "macros"
+    nativeImageSettings,
+    name      := "example",
+    mainClass := Some("pl.andrzejressel.workhole.example.Main")
   )
 
 lazy val resourceTest = (project in file("modules/resource_test"))

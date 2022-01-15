@@ -9,11 +9,9 @@ trait FunctionModule extends Module {
 
   def createSegment(state: ConsoleState): Option[Segment]
 
-  final override def getModulePipe: Pipe[IO, ConsoleState, Option[Segment]] = {
-    stream =>
-      stream.changes
-        .map(createSegment)
-        .changes
-  }
+  final override def getModulePipe: Pipe[IO, ConsoleState, Option[Segment]] =
+    _.changes
+      .map(createSegment)
+      .changes
 
 }

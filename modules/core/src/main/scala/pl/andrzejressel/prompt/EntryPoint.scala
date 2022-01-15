@@ -9,13 +9,8 @@ import pl.andrzejressel.prompt.ColorToShellConverter.{
   getBackgroundEscapeCode,
   getForegroundEscapeCode
 }
-import pl.andrzejressel.prompt.model.{
-  AnsiColor,
-  ConsoleReducer,
-  ConsoleState,
-  Segment
-}
-import pl.andrzejressel.prompt.module.{CurrentDirectory, CurrentTimeModule}
+import pl.andrzejressel.prompt.model.{ConsoleReducer, ConsoleState, Segment}
+import pl.andrzejressel.prompt.module.Module
 import pl.andrzejressel.prompt.terminal.Terminal
 import pl.andrzejressel.prompt.terminal.Terminal.PowerShell
 import pl.andrzejressel.prompt.unsafe.File.writeToFile
@@ -25,7 +20,7 @@ import pl.andrzejressel.prompt.utils.FS2Utils.prefetchKeepLatest
 import java.nio.file.Paths
 import java.util.Base64
 
-object Main extends IOApp.Simple {
+abstract class EntryPoint(modules: Seq[Module]) extends IOApp.Simple {
 
   override def run: IO[Unit] = run0()
 
@@ -40,11 +35,7 @@ object Main extends IOApp.Simple {
 
     val fileReader = ConsoleEventsReader[IO](inputFile)
 
-    val modules = Seq(
-      CurrentDirectory(AnsiColor.White, AnsiColor.Black),
-      CurrentTimeModule(AnsiColor.White, AnsiColor.Black)
-    )
-    val pipes   = modules.map(
+    val pipes = modules.map(
       prefetchKeepLatest[IO, ConsoleState]() andThen _.getModulePipe
     )
 

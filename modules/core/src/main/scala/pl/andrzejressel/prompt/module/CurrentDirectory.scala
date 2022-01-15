@@ -6,8 +6,8 @@ import pl.andrzejressel.prompt.interop.Java.eqPath
 import pl.andrzejressel.prompt.model.{Color, ConsoleState, Segment}
 
 case class CurrentDirectory(
-  override val textColor: Color,
-  override val backgroundColor: Color
+  textColor: Color,
+  backgroundColor: Color
 ) extends Module {
 
   override def getModulePipe: Pipe[IO, ConsoleState, Option[Segment]] = {

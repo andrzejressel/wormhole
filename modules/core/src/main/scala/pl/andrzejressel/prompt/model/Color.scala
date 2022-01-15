@@ -15,6 +15,7 @@ object Color {
 }
 
 case class EightBitColor(color: EightBitNumber) extends Color
+
 object EightBitColor {
   implicit val eightBitColorEq: Eq[EightBitColor] = semiauto.eq
 }
@@ -24,7 +25,8 @@ case class RGBColor(
   g: EightBitNumber,
   b: EightBitNumber
 ) extends Color
-object RGBColor      {
+
+object RGBColor {
   implicit val rgbColorEq: Eq[RGBColor] = semiauto.eq
 }
 
