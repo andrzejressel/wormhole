@@ -1,17 +1,20 @@
 package pl.andrzejressel.prompt
 
 import cats.effect._
-import cats.effect.kernel.Async
 import cats.implicits._
 import fs2.io.file.Files.forAsync
-import fs2.io.file._
 import io.odin.consoleLogger
 import pl.andrzejressel.prompt.ColorToShellConverter.{
   RESET_COLOR,
   getBackgroundEscapeCode,
   getForegroundEscapeCode
 }
-import pl.andrzejressel.prompt.model.{ConsoleReducer, ConsoleState, Segment}
+import pl.andrzejressel.prompt.model.{
+  AnsiColor,
+  ConsoleReducer,
+  ConsoleState,
+  Segment
+}
 import pl.andrzejressel.prompt.module.{CurrentDirectory, CurrentTimeModule}
 import pl.andrzejressel.prompt.terminal.Terminal
 import pl.andrzejressel.prompt.terminal.Terminal.PowerShell
@@ -24,24 +27,26 @@ import java.util.Base64
 
 object Main extends IOApp.Simple {
 
-  override def run: IO[Unit] = run0[IO]()
+  override def run: IO[Unit] = run0()
 
-  def run0[F[_]: Concurrent: Async: Files](): F[Unit] = {
+  def run0(): IO[Unit] = {
 
-    val logger = consoleLogger()
+    val logger = consoleLogger[IO]()
 
     val terminal = PowerShell
 
     val inputFile  = Paths.get("D:\\events")
     val outputFile = Paths.get("D:\\shell.txt")
 
-    val fileReader = ConsoleEventsReader[F](inputFile)
+    val fileReader = ConsoleEventsReader[IO](inputFile)
 
     val modules = Seq(
-      CurrentDirectory[F](),
-      CurrentTimeModule[F]()
+      CurrentDirectory(AnsiColor.White, AnsiColor.Black),
+      CurrentTimeModule(AnsiColor.White, AnsiColor.Black)
     )
-    val pipes   = modules.map(prefetchKeepLatest() andThen _.getModulePipe)
+    val pipes   = modules.map(
+      prefetchKeepLatest[IO, ConsoleState]() andThen _.getModulePipe
+    )
 
     fileReader
       .readConsoleEvents()
@@ -52,7 +57,7 @@ object Main extends IOApp.Simple {
       .map(_.flatten)
       .map(toPrompt(_, terminal))
       .map(text => Base64.getEncoder.encodeToString(text.getBytes()))
-      .evalMap(writeToFile[F](outputFile))
+      .evalMap(writeToFile[IO](outputFile))
       .compile
       .drain
 

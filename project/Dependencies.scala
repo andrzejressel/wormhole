@@ -27,7 +27,7 @@ object Dependencies {
 
     private val cron = "eu.timepit" %% "fs2-cron-cron4s" % "0.7.1"
 
-    val all = main :+ cron
+    val all: Seq[ModuleID] = main :+ cron
   }
 
   private object Circe {
@@ -39,7 +39,7 @@ object Dependencies {
     ).map(d => "io.circe" %% f"circe-$d" % circeVersion)
     private val circeFs2 = "io.circe" %% "circe-fs2" % circeFs2Version
 
-    val all = main :+ circeFs2
+    val all: Seq[ModuleID] = main :+ circeFs2
   }
 
   private val enumeratum = "com.beachape" %% "enumeratum" % enumeratumVersion
@@ -48,8 +48,9 @@ object Dependencies {
     private val core       = "eu.timepit" %% "refined" % refinedVersion
     private val scalacheck =
       "eu.timepit" %% "refined-scalacheck" % refinedVersion
+    private val cats = "eu.timepit" %% "refined-cats" % refinedVersion
 
-    val all = Seq(core, scalacheck)
+    val all = Seq(core, cats, scalacheck)
   }
 
   private object ApacheCommons {

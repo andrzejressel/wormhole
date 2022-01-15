@@ -1,14 +1,21 @@
 package pl.andrzejressel.prompt.module
 
-import cats.effect.Concurrent
-import cats.effect.kernel.Sync
+import cats.effect.IO
 import io.odin.Logger
-import pl.andrzejressel.prompt.model.{ConsoleState, LoggerComponent, Segment}
+import pl.andrzejressel.prompt.model.{
+  Color,
+  ConsoleState,
+  LoggerComponent,
+  Segment
+}
 
-abstract class Module[F[_]: Sync: Concurrent] {
+trait Module {
 
-  def getModulePipe: fs2.Pipe[F, ConsoleState, Option[Segment]]
+  def getModulePipe: fs2.Pipe[IO, ConsoleState, Option[Segment]]
 
-  protected val logger: Logger[F] = LoggerComponent.logger[F]
+  protected def textColor: Color
+  protected def backgroundColor: Color
+
+  protected val logger: Logger[IO] = LoggerComponent.logger[IO]
 
 }

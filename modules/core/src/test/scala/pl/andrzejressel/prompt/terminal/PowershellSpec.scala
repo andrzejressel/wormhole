@@ -73,6 +73,8 @@ class PowershellSpec
         .map[ConsoleEvent](decode[ConsoleEvent](_).value)
         .toList
 
+    consoleEvents should have size 2
+
     val initialDirEvent = consoleEvents
       .collectFirst { case x: ChangeDir => x }
 

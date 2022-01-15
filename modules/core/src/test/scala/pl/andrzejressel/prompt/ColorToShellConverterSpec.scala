@@ -19,7 +19,7 @@ class ColorToShellConverterSpec
     with ScalaCheckDrivenPropertyChecks {
 
   implicit val dataArb: Arbitrary[EightBitColor] = Arbitrary(
-    Gen.resultOf(EightBitColor)
+    Gen.resultOf(EightBitColor(_))
   )
 
   it should "generate foreground color for 8 bit color" in {
