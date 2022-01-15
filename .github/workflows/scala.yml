@@ -27,16 +27,7 @@ jobs:
         distribution: 'temurin'
     - name: Run tests
       run: sbt coverage test coverageReport
-    - name: Set up JDK 8 for codacy
-      uses: actions/setup-java@v2
-      with:
-        java-version: '8'
-        distribution: 'temurin'
-    - name: Run codacy-coverage-reporter
-      uses: codacy/codacy-coverage-reporter-action@v1
-      with:
-        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        coverage-reports: "modules/core/target/scala-2.13/coverage-report/cobertura.xml"
+    - run: bash <(curl -s https://codecov.io/bash)
 
   native_image:
     strategy:
