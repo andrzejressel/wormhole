@@ -2,17 +2,21 @@ import sbt._
 
 object Dependencies {
 
-  private val fs2Version        = "3.2.0"
-  private val circeVersion      = "0.14.1"
-  private val circeFs2Version   = "0.14.0"
-  private val catsEffectVersion = "3.3.0"
-  private val enumeratumVersion = "1.7.0"
-  private val refinedVersion    = "0.9.28"
+  val scalaVersion               = "2.13.8"
+  private val fs2Version         = "3.2.4"
+  private val circeVersion       = "0.14.1"
+  private val circeFs2Version    = "0.14.0"
+  private val catsEffectVersion  = "3.3.4"
+  private val enumeratumVersion  = "1.7.0"
+  private val refinedVersion     = "0.9.28"
+  private val kittensVersion     = "2.3.2"
+  private val fs2CronVersion     = "0.7.1"
+  private val commonsLangVersion = "3.12.0"
 
   private object Cats {
     private val catsEffect =
       "org.typelevel" %% "cats-effect" % catsEffectVersion
-    private val kittens = "org.typelevel" %% "kittens" % "2.3.2"
+    private val kittens = "org.typelevel" %% "kittens" % kittensVersion
 
     val all = Seq(catsEffect, kittens)
   }
@@ -25,7 +29,7 @@ object Dependencies {
       "scodec"
     ).map(d => "co.fs2" %% f"fs2-$d" % fs2Version)
 
-    private val cron = "eu.timepit" %% "fs2-cron-cron4s" % "0.7.1"
+    private val cron = "eu.timepit" %% "fs2-cron-cron4s" % fs2CronVersion
 
     val all: Seq[ModuleID] = main :+ cron
   }
@@ -54,7 +58,8 @@ object Dependencies {
   }
 
   private object ApacheCommons {
-    private val lang3 = "org.apache.commons" % "commons-lang3" % "3.12.0"
+    private val lang3 =
+      "org.apache.commons" % "commons-lang3" % commonsLangVersion
 
     val all = Seq(lang3)
   }
@@ -90,9 +95,8 @@ object Dependencies {
   ).map(_ % "0.13.0")
 
   private val caseInsensitive = "org.typelevel"      %% "case-insensitive" % "1.2.0"
-  private val pty4j           = "org.jetbrains.pty4j" % "pty4j"            % "0.12.6" % Test
+  private val pty4j           = "org.jetbrains.pty4j" % "pty4j"            % "0.12.7" % Test
 
-  val scalaVersion       = "2.13.7"
   val all: Seq[ModuleID] =
     Seq(enumeratum, caseInsensitive, pty4j) ++
       FS2.all ++
