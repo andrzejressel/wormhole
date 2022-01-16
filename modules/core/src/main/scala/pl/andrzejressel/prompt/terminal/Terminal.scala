@@ -1,6 +1,8 @@
 package pl.andrzejressel.prompt.terminal
 
-import enumeratum.{EnumEntry, _}
+import enumeratum._
+import pl.andrzejressel.prompt.interop.Scopt.scoptRead
+import scopt.Read
 
 sealed trait Terminal extends EnumEntry {
   def escapeColor(color: String): String = color
@@ -9,6 +11,8 @@ sealed trait Terminal extends EnumEntry {
 
 object Terminal extends Enum[Terminal] {
   val values: IndexedSeq[Terminal] = findValues
+
+  implicit val terminalRead: Read[Terminal] = scoptRead(Terminal)
 
   case object PowerShell extends Terminal {
     override def getConfigFile(): String = "/terminal/powershell.ps1"

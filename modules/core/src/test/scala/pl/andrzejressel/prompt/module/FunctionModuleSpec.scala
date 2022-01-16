@@ -6,10 +6,12 @@ import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.implicits.catsSyntaxOptionId
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
+import org.typelevel.ci.CIStringSyntax
 import pl.andrzejressel.prompt.model.AnsiColor.Black
 import pl.andrzejressel.prompt.model.{ConsoleState, Segment}
 import pl.andrzejressel.prompt.utils.PromptEventually
 
+import java.nio.file.Paths
 import java.util.concurrent.atomic.AtomicInteger
 
 class FunctionModuleSpec
@@ -22,9 +24,9 @@ class FunctionModuleSpec
 
     val createSegmentInvocations = new AtomicInteger(0)
 
-    val cs1 = ConsoleState(pid = 1.some, currentDirectory = None, env = Map())
-    val cs2 = ConsoleState(pid = 2.some, currentDirectory = None, env = Map())
-    val cs3 = ConsoleState(pid = 3.some, currentDirectory = None, env = Map())
+    val cs1 = ConsoleState(currentDirectory = None, env = Map(ci"a" -> "1"))
+    val cs2 = ConsoleState(currentDirectory = None, env = Map(ci"a" -> "2"))
+    val cs3 = ConsoleState(currentDirectory = None, env = Map(ci"a" -> "3"))
 
     val csStream = fs2.Stream(cs1, cs1, cs2, cs2, cs2, cs3)
 
@@ -43,25 +45,33 @@ class FunctionModuleSpec
 
   it should "handle duplicates at output" in async[IO] {
     val createSegmentInvocations = new AtomicInteger(0)
+    val path                     = Paths.get("")
 
-    val csEven1 =
-      ConsoleState(pid = 1.some, currentDirectory = None, env = Map())
-    val csEven2 =
-      ConsoleState(pid = 3.some, currentDirectory = None, env = Map())
-    val csEven3 =
-      ConsoleState(pid = 5.some, currentDirectory = None, env = Map())
+    val csWithPath1 =
+      ConsoleState(currentDirectory = path.some, env = Map(ci"a" -> "1"))
+    val csWithPath2 =
+      ConsoleState(currentDirectory = path.some, env = Map(ci"a" -> "2"))
+    val csWithPath3 =
+      ConsoleState(currentDirectory = path.some, env = Map(ci"a" -> "3"))
 
-    val csOdd1 =
-      ConsoleState(pid = 2.some, currentDirectory = None, env = Map())
-    val csOdd2 =
-      ConsoleState(pid = 4.some, currentDirectory = None, env = Map())
+    val csWithoutPath1 =
+      ConsoleState(currentDirectory = None, env = Map(ci"a" -> "4"))
+    val csWithoutPath2 =
+      ConsoleState(currentDirectory = None, env = Map(ci"a" -> "5"))
 
-    val csStream = fs2.Stream(csEven1, csEven2, csOdd1, csOdd2, csEven3)
+    val csStream =
+      fs2.Stream(
+        csWithPath1,
+        csWithPath2,
+        csWithoutPath1,
+        csWithoutPath2,
+        csWithPath3
+      )
 
     val module = new FunctionModule {
       override def createSegment(state: ConsoleState): Option[Segment] = {
         createSegmentInvocations.incrementAndGet()
-        Segment((state.pid.get % 2).toString, Black, Black).some
+        Segment(state.currentDirectory.toString, Black, Black).some
       }
     }
 
@@ -72,9 +82,9 @@ class FunctionModuleSpec
       .await
 
     segments shouldEqual Seq(
-      Segment("1", Black, Black).some,
-      Segment("0", Black, Black).some,
-      Segment("1", Black, Black).some
+      Segment(path.some.toString, Black, Black).some,
+      Segment(None.toString, Black, Black).some,
+      Segment(path.some.toString, Black, Black).some
     )
 
     createSegmentInvocations.get() shouldBe 5

@@ -33,7 +33,11 @@ object ConfigGenerator {
         Matcher.quoteReplacement(consolePromptDirectory.toString)
       )
 
-    Config(text, consolePromptDirectory, consoleEventsDirectory)
+    Config(
+      text = text,
+      consolePromptDirectory = consolePromptDirectory,
+      consoleEventsDirectory = consoleEventsDirectory
+    )
 
   }
 

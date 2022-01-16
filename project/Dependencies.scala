@@ -12,6 +12,7 @@ object Dependencies {
   private val kittensVersion     = "2.3.2"
   private val fs2CronVersion     = "0.7.1"
   private val commonsLangVersion = "3.12.0"
+  private val scoptVersion       = "4.0.1"
 
   private object Cats {
     private val catsEffect =
@@ -104,10 +105,11 @@ object Dependencies {
     val all: Seq[ModuleID] = Seq(pty4j, guava, log4j).map(_ % Test)
   }
 
-  private val caseInsensitive = "org.typelevel" %% "case-insensitive" % "1.2.0"
+  private val caseInsensitive = "org.typelevel"    %% "case-insensitive" % "1.2.0"
+  private val scopt           = "com.github.scopt" %% "scopt"            % scoptVersion
 
   val all: Seq[ModuleID] =
-    Seq(enumeratum, caseInsensitive) ++
+    Seq(enumeratum, caseInsensitive, scopt) ++
       FS2.all ++
       Cats.all ++
       Circe.all ++

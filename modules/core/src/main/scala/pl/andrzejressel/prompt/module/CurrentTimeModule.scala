@@ -1,7 +1,6 @@
 package pl.andrzejressel.prompt.module
 
 import cats.effect.IO
-import cats.effect.kernel.Sync
 import cron4s.Cron
 import eu.timepit.fs2cron.cron4s.Cron4sScheduler
 import fs2.Pipe
@@ -16,9 +15,8 @@ case class CurrentTimeModule(
   pattern: String = "yyyy-MM-dd HH:mm:ss"
 ) extends Module {
 
-  private val SYNC          = Sync[IO]
   private val cronScheduler = Cron4sScheduler.systemDefault[IO]
-  private val evenSeconds   = Cron.unsafeParse("* * * ? * *")
+  private val secondsCron   = Cron.unsafeParse("* * * ? * *")
 
   private val DATE_TIME_FORMATTER = DateTimeFormatter
     .ofPattern(pattern)
@@ -27,9 +25,9 @@ case class CurrentTimeModule(
   override def getModulePipe: Pipe[IO, ConsoleState, Option[Segment]] = {
     stream =>
       cronScheduler
-        .awakeEvery(evenSeconds)
+        .awakeEvery(secondsCron)
         .concurrently(stream)
-        .evalMap(_ => SYNC.delay(Instant.now()))
+        .evalMap(_ => IO(Instant.now()))
         .map(DATE_TIME_FORMATTER.format)
         .map(Segment(_, textColor, backgroundColor))
         .map(Some(_))
