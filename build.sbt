@@ -21,7 +21,8 @@ val commonSettings = Seq(
     "-Xfatal-warnings",
     "-Xlint:-byname-implicit",
     // "-feature",
-    "-language:implicitConversions"
+    "-language:implicitConversions",
+    "-Xasync"
     // ...
   ),
   resolvers +=

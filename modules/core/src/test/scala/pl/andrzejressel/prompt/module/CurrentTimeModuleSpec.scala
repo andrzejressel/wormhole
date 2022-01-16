@@ -1,6 +1,7 @@
 package pl.andrzejressel.prompt.module
 
 import cats.effect.IO
+import cats.effect.cps._
 import cats.effect.testing.scalatest.AsyncIOSpec
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
@@ -16,32 +17,29 @@ class CurrentTimeModuleSpec
     with AsyncIOSpec
     with PromptEventually {
 
-  it should "generate full seconds" in {
+  it should "generate full seconds" in async[IO] {
 
     val stream =
       fs2.Stream(ConsoleState.initial)
 
     val module = CurrentTimeModule(Black, Black)
 
-    for {
-      startTime <- IO(Instant.now())
-      values    <- stream
-                     .through(module.getModulePipe)
-                     .take(5)
-                     .compile
-                     .toList
+    val startTime = Instant.now()
+    val values    = stream
+      .through(module.getModulePipe)
+      .take(5)
+      .compile
+      .toList
+      .await
 
-      _ = values shouldNot contain(None)
-      _ = values should have size 5
-      // List contain distinct elements
-      _ = values.toSet should have size 5
+    values shouldNot contain(None)
+    values should have size 5
+    // List contain distinct elements
+    values.toSet should have size 5
 
-      endTime <- IO(Instant.now())
-      _       <- IO(Duration.between(startTime, endTime))
-                   .map(_.toSeconds)
-                   .asserting(Seq(4, 5, 6) should contain(_))
-    } yield ()
-
+    val endTime           = Instant.now()
+    val durationInSeconds = Duration.between(startTime, endTime).toSeconds
+    Seq(4, 5, 6) should contain(durationInSeconds)
   }
 
 }

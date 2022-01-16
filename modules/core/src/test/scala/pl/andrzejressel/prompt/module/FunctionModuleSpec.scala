@@ -1,6 +1,7 @@
 package pl.andrzejressel.prompt.module
 
 import cats.effect.IO
+import cats.effect.cps._
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.implicits.catsSyntaxOptionId
 import org.scalatest.flatspec.AsyncFlatSpec
@@ -40,7 +41,7 @@ class FunctionModuleSpec
     } yield ()
   }
 
-  it should "handle duplicates at output" in {
+  it should "handle duplicates at output" in async[IO] {
     val createSegmentInvocations = new AtomicInteger(0)
 
     val csEven1 =
@@ -64,20 +65,20 @@ class FunctionModuleSpec
       }
     }
 
-    for {
-      _ <- csStream
-             .through(module.getModulePipe)
-             .compile
-             .toList
-             .asserting(
-               _ shouldEqual Seq(
-                 Segment("1", Black, Black).some,
-                 Segment("0", Black, Black).some,
-                 Segment("1", Black, Black).some
-               )
-             )
-      _ <- IO(createSegmentInvocations).asserting(_.get() shouldBe 5)
-    } yield ()
+    val segments = csStream
+      .through(module.getModulePipe)
+      .compile
+      .toList
+      .await
+
+    segments shouldEqual Seq(
+      Segment("1", Black, Black).some,
+      Segment("0", Black, Black).some,
+      Segment("1", Black, Black).some
+    )
+
+    createSegmentInvocations.get() shouldBe 5
+
   }
 
 }

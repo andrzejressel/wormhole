@@ -16,9 +16,10 @@ object Dependencies {
   private object Cats {
     private val catsEffect =
       "org.typelevel" %% "cats-effect" % catsEffectVersion
-    private val kittens = "org.typelevel" %% "kittens" % kittensVersion
+    private val kittens = "org.typelevel" %% "kittens"         % kittensVersion
+    private val cps     = "org.typelevel" %% "cats-effect-cps" % "0.3.0"
 
-    val all = Seq(catsEffect, kittens)
+    val all = Seq(catsEffect, kittens, cps)
   }
 
   private object FS2 {
