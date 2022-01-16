@@ -19,6 +19,7 @@ import pl.andrzejressel.prompt.utils.{PromptEventually, WindowsOnly}
 
 import java.io.FileInputStream
 import java.nio.file.{Files, Path}
+import java.util.Base64
 
 class PowershellSpec
     extends AnyFlatSpec
@@ -38,7 +39,9 @@ class PowershellSpec
     config = ConfigGenerator.generate(PowerShell)
     startDirectory = Files.createTempDirectory(null)
 
-    println(config.tempDir)
+    val script = Files.createTempFile(null, ".ps1")
+    Files.writeString(script, config.text)
+    Files.writeString(config.consolePromptDirectory.resolve("prompt.txt"), "")
 
     val cmd = Array("powershell")
     process = new PtyProcessBuilder()
@@ -50,7 +53,7 @@ class PowershellSpec
     stderr = process.startStderrGobbler()
 
     process.writeToStdinAndFlush(
-      config.text,
+      script.toAbsolutePath.toString,
       hitEnter = true
     )
 
@@ -63,14 +66,16 @@ class PowershellSpec
 
   it should "generate initial info" in {
 
-    eventually { config.tempDir.toFile.listFiles() should have size 2 }
+    eventually {
+      config.consoleEventsDirectory.toFile.listFiles() should have size 2
+    }
 
     val consoleEvents =
-      config.tempDir.toFile
+      config.consoleEventsDirectory.toFile
         .listFiles()
         .map(new FileInputStream(_).readAllBytes())
         .map(new String(_))
-        .map[ConsoleEvent](decode[ConsoleEvent](_).value)
+        .map(decode[ConsoleEvent](_).value)
         .toList
 
     consoleEvents should have size 2
@@ -83,6 +88,48 @@ class PowershellSpec
 
     initialDirEvent.value.dir.expand() shouldBe this.startDirectory.expand()
     initialEnvEvent.value.env should contain(ci"os" -> "Windows_NT")
+
+  }
+
+  it should "apply prompt" in {
+
+    // Wait for Powershell to initialize FileSystemWatcher
+    Thread.sleep(1000)
+
+    Files.writeString(
+      config.consolePromptDirectory.resolve("prompt.txt"),
+      Base64.getEncoder.encodeToString("My prompt>".getBytes)
+    )
+
+    stdout.assertEndsWith("My prompt>")
+
+  }
+
+  it should "should send event on directory change" in {
+
+    eventually {
+      config.consoleEventsDirectory.toFile.listFiles() should have size 2
+    }
+    config.consoleEventsDirectory.toFile.listFiles().foreach(_.delete())
+    val newDir = Files.createTempDirectory(null)
+
+    process.writeToStdinAndFlush(f"cd \"$newDir\"", hitEnter = true)
+
+    eventually {
+      config.consoleEventsDirectory.toFile.listFiles() should have size 1
+    }
+
+    val event =
+      config.consoleEventsDirectory.toFile
+        .listFiles()
+        .map(new FileInputStream(_).readAllBytes())
+        .map(new String(_))
+        .map(decode[ConsoleEvent](_).value)
+        .toList
+        .head
+        .asInstanceOf[ChangeDir]
+
+    event.dir.expand() shouldBe newDir.expand()
 
   }
 

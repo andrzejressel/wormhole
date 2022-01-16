@@ -180,6 +180,11 @@ public class PtyTest {
       return myOutput.toString();
     }
 
+    @NotNull
+    public String getCleanOutput() {
+      return cleanWinText(getOutput());
+    }
+
     public void awaitFinish() throws InterruptedException {
       myThread.join(TimeUnit.SECONDS.toMillis(WAIT_TIMEOUT_SECONDS));
     }

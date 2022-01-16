@@ -1,20 +1,21 @@
-if ($host.Name -eq 'ConsoleHost')
-{
+# if ($host.Name -eq 'ConsoleHost')
+# {
     Import-Module PSReadLine
-}
+# }
 
-Set-PSReadlineOption -ExtraPromptLineCount 1
+# Set-PSReadlineOption -ExtraPromptLineCount 1
 
 $global:prompt = "TEST1"
 $global:showPrompt = $true
 $global:promptTimer = Get-Date
 $global:previousLocation = ""
 $global:previousEnvs = @()
+$global:eventsDir = "CONSOLE_EVENTS_DIRECTORY"
+$global:promptDir = "CONSOLE_PROMPT_DIRECTORY"
 
 Register-EngineEvent -SourceIdentifier PowerShell.OnIdle -Action {
     "Don't allow powershell to go idle"
-    "PowerShell idle at {0}" -f (Get-Date) |
-    Out-File -FilePath $null -Append
+    "PowerShell idle at {0}" -f (Get-Date) | out-null
 }
 
 function global:Update-Prompt-All {
@@ -26,7 +27,7 @@ function global:Update-Prompt-All {
 
 function global:Save-Prompt-Event($promptEvent) {
     $time = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    $OutputFile = "TEMP_DIR\$time.json"
+    $OutputFile = "$global:eventsDir\$time.json"
     $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($False)
     [System.IO.File]::WriteAllLines($OutputFile, $promptEvent, $Utf8NoBomEncoding)
 }
@@ -69,23 +70,23 @@ function global:prompt {
 }
 
 # TODO: Add support for Ctrl-C
-Set-PSReadLineKeyHandler -Chord Enter -ScriptBlock {
-    $global:promptTimer = (Get-Date).AddSeconds(1)
-    $backup = $global:prompt
-    $global:prompt = "> "
-    [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
-    $global:prompt = $backup
-    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    $global:promptTimer = (Get-Date).AddMilliseconds(10)
-}
+# $null = Set-PSReadLineKeyHandler -Chord Enter -ScriptBlock {
+#     $global:promptTimer = (Get-Date).AddSeconds(1)
+#     $backup = $global:prompt
+#     $global:prompt = "> "
+#     [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
+#     $global:prompt = $backup
+#     [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+#     $global:promptTimer = (Get-Date).AddMilliseconds(10)
+# }
 
-$file = "TEMP_FILE_PARENT"
-$filter = "TEMP_FILE_NAME"
+$file = $global:promptDir
+$filter = "prompt.txt"
 $Watcher = New-Object IO.FileSystemWatcher $file, $filter -Property @{
     IncludeSubdirectories = $false
     NotifyFilter = [IO.NotifyFilters]'LastWrite'
 }
-Register-ObjectEvent $Watcher -EventName Changed -SourceIdentifier PromptFileCreated -Action {
+$null = Register-ObjectEvent $Watcher -EventName Changed -SourceIdentifier PromptFileCreated -Action {
    try {
     $path = $Event.SourceEventArgs.FullPath
     $text = [System.IO.File]::ReadAllText($path);
@@ -94,7 +95,7 @@ Register-ObjectEvent $Watcher -EventName Changed -SourceIdentifier PromptFileCre
         [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
     }
    } catch {
-    #    Write-Host "An error occurred:"
-    #    Write-Host $_
+       Write-Host "An error occurred:"
+       Write-Host $_
    }
 }

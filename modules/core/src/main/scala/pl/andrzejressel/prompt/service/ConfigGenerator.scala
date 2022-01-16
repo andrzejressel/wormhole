@@ -10,8 +10,8 @@ object ConfigGenerator {
 
   case class Config(
     text: String,
-    tempFile: Path,
-    tempDir: Path
+    consolePromptDirectory: Path,
+    consoleEventsDirectory: Path
   )
 
   def generate(terminal: Terminal): Config = {
@@ -20,24 +20,20 @@ object ConfigGenerator {
       .fromInputStream(getClass.getResourceAsStream(terminal.getConfigFile()))
       .mkString
 
-    val tempFile     = Files.createTempFile(null, null)
-    val tempFileName = tempFile.toFile.getName
-    val parent       = tempFile.toFile.getParentFile.getAbsolutePath
-    val tempDir      = Files.createTempDirectory(null)
+    val consoleEventsDirectory = Files.createTempDirectory(null).toAbsolutePath
+    val consolePromptDirectory = Files.createTempDirectory(null).toAbsolutePath
 
     val text = config
       .replaceAll(
-        "TEMP_DIR",
-        Matcher.quoteReplacement(tempDir.toFile.getAbsolutePath)
+        "CONSOLE_EVENTS_DIRECTORY",
+        Matcher.quoteReplacement(consoleEventsDirectory.toString)
       )
-      .replaceAll("TEMP_FILE_NAME", Matcher.quoteReplacement(tempFileName))
-      .replaceAll("TEMP_FILE_PARENT", Matcher.quoteReplacement(parent))
       .replaceAll(
-        "TEMP_FILE",
-        Matcher.quoteReplacement(tempFile.toFile.getAbsolutePath)
+        "CONSOLE_PROMPT_DIRECTORY",
+        Matcher.quoteReplacement(consolePromptDirectory.toString)
       )
 
-    Config(text, tempFile, tempDir)
+    Config(text, consolePromptDirectory, consoleEventsDirectory)
 
   }
 
