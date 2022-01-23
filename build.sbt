@@ -39,7 +39,7 @@ val nativeImageSettings = Seq(
 lazy val root = (project in file("."))
   .aggregate(core, example, resourceTest)
   .settings(
-    name := "prompt"
+    name := "wormhole"
   )
 
 lazy val core = (project in file("modules/core"))
@@ -57,7 +57,7 @@ lazy val example = (project in file("modules/example"))
     commonSettings,
     nativeImageSettings,
     name      := "example",
-    mainClass := Some("pl.andrzejressel.workhole.example.Main")
+    mainClass := Some("pl.andrzejressel.wormhole.example.Main")
   )
 
 lazy val resourceTest = (project in file("modules/resource_test"))
@@ -67,5 +67,5 @@ lazy val resourceTest = (project in file("modules/resource_test"))
     commonSettings,
     nativeImageSettings,
     name      := "resource_test",
-    mainClass := Some("pl.andrzejressel.prompt.resource_test.Main")
+    mainClass := Some("pl.andrzejressel.wormhole.resource_test.Main")
   )
