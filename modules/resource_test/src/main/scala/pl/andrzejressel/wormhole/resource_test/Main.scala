@@ -9,7 +9,9 @@ object Main {
 
     Terminal.values.foreach(terminal =>
       Source
-        .fromInputStream(getClass.getResourceAsStream(terminal.getConfigFile()))
+        .fromInputStream(
+          getClass.getResourceAsStream(terminal.configFileLocation)
+        )
         .mkString
     )
 

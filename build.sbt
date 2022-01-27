@@ -31,7 +31,8 @@ val commonSettings = Seq(
 
 val nativeImageSettings = Seq(
   nativeImageOptions ++= List(
-    "--no-fallback"
+    "--no-fallback",
+    "-J-Dfile.encoding=UTF-8"
   ),
   nativeImageVersion := "21.3.0"
 )

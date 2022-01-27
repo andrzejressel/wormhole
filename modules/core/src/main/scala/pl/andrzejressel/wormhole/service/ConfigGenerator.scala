@@ -17,7 +17,9 @@ object ConfigGenerator {
   def generate(terminal: Terminal): Config = {
 
     val config = Source
-      .fromInputStream(getClass.getResourceAsStream(terminal.getConfigFile()))
+      .fromInputStream(
+        getClass.getResourceAsStream(terminal.configFileLocation)
+      )
       .mkString
 
     val consoleEventsDirectory = Files.createTempDirectory(null).toAbsolutePath

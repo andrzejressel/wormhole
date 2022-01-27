@@ -20,6 +20,7 @@ import pl.andrzejressel.wormhole.utils.{PromptEventually, WindowsOnly}
 import java.io.FileInputStream
 import java.nio.file.{Files, Path}
 import java.util.Base64
+import scala.jdk.CollectionConverters._
 
 class PowershellSpec
     extends AnyFlatSpec
@@ -43,9 +44,13 @@ class PowershellSpec
     Files.writeString(script, config.text)
     Files.writeString(config.consolePromptDirectory.resolve("prompt.txt"), "")
 
-    val cmd = Array("powershell")
+    val env    = System.getenv.asScala.to(Map)
+    val newEnv = env + ("WORMHOLE_COMMAND" -> "")
+
+    val cmd = Array("powershell", "-NoProfile")
     process = new PtyProcessBuilder()
       .setCommand(cmd)
+      .setEnvironment(newEnv.asJava)
       .setDirectory(startDirectory.toString)
       .start
 
@@ -98,10 +103,10 @@ class PowershellSpec
 
     Files.writeString(
       config.consolePromptDirectory.resolve("prompt.txt"),
-      Base64.getEncoder.encodeToString("My prompt>".getBytes)
+      Base64.getEncoder.encodeToString("My prompt\n>".getBytes)
     )
 
-    stdout.assertEndsWith("My prompt>")
+    stdout.assertEndsWith("My prompt\r\n>")
 
   }
 

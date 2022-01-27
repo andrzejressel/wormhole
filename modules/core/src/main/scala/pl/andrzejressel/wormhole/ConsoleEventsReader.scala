@@ -19,9 +19,14 @@ case class ConsoleEventsReader[
   private val fs2Path = fromNioPath(file)
 
   def readConsoleEvents(): fs2.Stream[F, ConsoleEvent] = {
-    Files[F]
+    val newFiles = Files[F]
       .watch(fs2Path, Seq(EventType.Modified), Nil, 1.second)
       .flatMap(pathOf)
+
+    val existingFiles = Files[F].list(fs2Path).map(_.toNioPath)
+
+    newFiles
+      .merge(existingFiles)
       .flatMap(readFile[F])
       .flatMap(decode[F, ConsoleEvent])
   }
