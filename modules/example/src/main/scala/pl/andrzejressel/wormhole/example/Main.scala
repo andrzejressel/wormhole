@@ -7,8 +7,8 @@ import pl.andrzejressel.wormhole.module.{CurrentDirectory, CurrentTimeModule}
 
 object Main
     extends EntryPoint(
-      Config(modules =
-        Seq(
+      Config(
+        modules = Seq(
           CurrentDirectory(White, Black),
           CurrentTimeModule(White, Black)
         )

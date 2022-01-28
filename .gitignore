@@ -46,3 +46,5 @@ bin/
 
 #TODO: Remove
 shell/
+
+.gradle

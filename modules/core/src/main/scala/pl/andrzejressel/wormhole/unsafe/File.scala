@@ -5,9 +5,9 @@ import cats.effect._
 import cats.effect.kernel.Sync
 import cats.implicits._
 
-import java.io.{FileInputStream, RandomAccessFile}
-import java.nio.ByteBuffer
-import java.nio.file.{Path => JPath}
+import java.io.FileInputStream
+import java.nio.file.StandardOpenOption._
+import java.nio.file.{Files, Path => JPath}
 import scala.io.Source
 
 object File {
@@ -30,25 +30,35 @@ object File {
     path: JPath
   )(text: String)(implicit F: Sync[F]): F[Unit] = {
 
-    val fileResource    = Resource.fromAutoCloseable(
-      F.delay(new RandomAccessFile(path.toFile, "rw"))
-    )
-    val channelResource = (file: RandomAccessFile) =>
-      Resource.fromAutoCloseable(F.delay(file.getChannel))
-
-    fileResource
-      .flatMap(channelResource)
-      .use { channel =>
-        F.blocking {
-          channel
-            .truncate(0)
-            .write(ByteBuffer.wrap(text.getBytes))
-        }
-      }
+    F.blocking(
+      Files.writeString(path, text, CREATE, TRUNCATE_EXISTING)
+    ).void
       .attempt
-      .map(logThrowable[F, Int]("Cannot write to file"))
+      .map(logThrowable[F, Unit]("Cannot write to file"))
       .flatMap(_.value)
       .void
+
   }
+
+//    val fileResource    = Resource.fromAutoCloseable(
+//      F.delay(new RandomAccessFile(path.toFile, "rw"))
+//    )
+//    val channelResource = (file: RandomAccessFile) =>
+//      Resource.fromAutoCloseable(F.delay(file.getChannel))
+//
+//    fileResource
+//      .flatMap(channelResource)
+//      .use { channel =>
+//        F.blocking {
+//          channel
+//            .truncate(0)
+//            .write(ByteBuffer.wrap(text.getBytes))
+//        }
+//      }
+//      .attempt
+//      .map(logThrowable[F, Int]("Cannot write to file"))
+//      .flatMap(_.value)
+//      .void
+//  }
 
 }

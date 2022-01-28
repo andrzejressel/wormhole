@@ -17,29 +17,37 @@ class CurrentTimeModuleSpec
     with AsyncIOSpec
     with PromptEventually {
 
-  it should "generate full seconds" in async[IO] {
+  it should "generate full seconds" in eventually {
+    async[IO] {
+      val stream =
+        fs2.Stream(ConsoleState.initial)
 
-    val stream =
-      fs2.Stream(ConsoleState.initial)
+      val module = CurrentTimeModule(Black, Black)
 
-    val module = CurrentTimeModule(Black, Black)
+      val startTime = Instant.now()
+      val values    = stream
+        .through(module.getModulePipe)
+        .take(5)
+        .compile
+        .toList
+        .await
 
-    val startTime = Instant.now()
-    val values    = stream
-      .through(module.getModulePipe)
-      .take(5)
-      .compile
-      .toList
-      .await
+      values shouldNot contain(None)
+      values should have size 5
+      // List contain distinct elements
+      values.toSet should have size 5
 
-    values shouldNot contain(None)
-    values should have size 5
-    // List contain distinct elements
-    values.toSet should have size 5
-
-    val endTime           = Instant.now()
-    val durationInSeconds = Duration.between(startTime, endTime).toSeconds
-    Seq(4, 5, 6) should contain(durationInSeconds)
+      val endTime           = Instant.now()
+      val durationInSeconds = Duration.between(startTime, endTime).toSeconds
+      Seq(4, 5, 6) should contain(durationInSeconds)
+    }
   }
+
+//  @inline
+//  private def eventuallyAsync[A](
+//    body: => A
+//  )(implicit F: cats.effect.kernel.Async[IO]): IO[A] = eventually {
+//    async[IO](body)
+//  }
 
 }
