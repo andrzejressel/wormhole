@@ -99,7 +99,8 @@ class PowershellSpec
   it should "apply prompt" in {
 
     // Wait for Powershell to initialize FileSystemWatcher
-    Thread.sleep(1000)
+    // TODO: Make it smarter
+    Thread.sleep(5000)
 
     Files.writeString(
       config.consolePromptDirectory.resolve("prompt.txt"),
