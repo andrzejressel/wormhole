@@ -42,7 +42,7 @@ class PowershellE2ESpec extends AnyFlatSpec with should.Matchers with Retries {
       s"powersession.exe rec \"${Utils.outputDir.resolve("PowershellE2ESpec.txt")}\"",
       hitEnter = true
     )
-    sleep(1000)
+    sleep(4000)
     process.writeToStdinAndFlush(setEnv, hitEnter = true)
     sleep(1000)
     process.writeToStdinAndFlush(invoke, hitEnter = true)
