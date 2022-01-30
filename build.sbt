@@ -6,6 +6,29 @@ Global / excludeLintKeys += mainClass
 
 scalaVersion := Dependencies.scalaVersion
 
+val windowsOnlyTag = "tags.WindowsOnly"
+val linuxOnlyTag   = "tags.LinuxOnly"
+val macOnlyTag     = "tags.MacOnly"
+
+val tagsToIgnore = {
+  System.getProperty("os.name").toLowerCase match {
+    case mac if mac.contains("mac")       =>
+      List(windowsOnlyTag, linuxOnlyTag)
+    case win if win.contains("win")       =>
+      List(linuxOnlyTag, macOnlyTag)
+    case linux if linux.contains("linux") =>
+      List(windowsOnlyTag, macOnlyTag)
+    case osName                           =>
+      throw new RuntimeException(s"Unknown operating system $osName")
+  }
+}.map(tag =>
+  Tests.Argument(
+    TestFrameworks.ScalaTest,
+    "-l",
+    tag
+  )
+)
+
 val commonSettings = Seq(
   version           := "0.1.0-SNAPSHOT",
   // Locked by https://github.com/circe/circe-generic-extras/issues/168
@@ -26,7 +49,8 @@ val commonSettings = Seq(
     // ...
   ),
   resolvers +=
-    "Jetbrains repository" at "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies"
+    "Jetbrains repository" at "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies",
+  Test / testOptions ++= tagsToIgnore
 )
 
 val nativeImageSettings = Seq(
