@@ -5,7 +5,7 @@ import cats.effect.testing.scalatest.AsyncIOSpec
 import fs2.Pipe
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.should
-import pl.andrzejressel.wormhole.test_utils.PromptEventually
+import pl.andrzejressel.wormhole.test_utils.WormholeEventually
 import pl.andrzejressel.wormhole.utils.FS2Utils.{
   prefetchKeepLatest,
   shareAndCombine
@@ -19,7 +19,7 @@ class FS2UtilsSpec
     extends AsyncFreeSpec
     with should.Matchers
     with AsyncIOSpec
-    with PromptEventually {
+    with WormholeEventually {
 
   override implicit def executionContext: ExecutionContext =
     ExecutionContext.fromExecutor(Executors.newCachedThreadPool())

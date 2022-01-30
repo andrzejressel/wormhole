@@ -7,7 +7,7 @@ import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
 import pl.andrzejressel.wormhole.model.AnsiColor.Black
 import pl.andrzejressel.wormhole.model.ConsoleState
-import pl.andrzejressel.wormhole.test_utils.PromptEventually
+import pl.andrzejressel.wormhole.test_utils.WormholeEventually
 
 import java.time.{Duration, Instant}
 
@@ -15,7 +15,7 @@ class CurrentTimeModuleSpec
     extends AsyncFlatSpec
     with should.Matchers
     with AsyncIOSpec
-    with PromptEventually {
+    with WormholeEventually {
 
   it should "generate full seconds" in eventually {
     async[IO] {
