@@ -1,22 +1,28 @@
 package pl.andrzejressel.wormhole.e2e
 
 import com.pty4j.PtyProcessBuilder
+import org.scalatest.{Outcome, Retries}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
+import org.scalatest.tagobjects.Retryable
 import pl.andrzejressel.wormhole.test_utils.PtyTestOps.{
   ProcessOps,
   PtyProcessOps
 }
-import pl.andrzejressel.wormhole.test_utils.WindowsOnly
-
+import tags.WindowsOnly
 import java.lang.Thread.sleep
 
-class PowershellE2ESpec
-    extends AnyFlatSpec
-    with should.Matchers
-    with WindowsOnly {
+@WindowsOnly
+class PowershellE2ESpec extends AnyFlatSpec with should.Matchers with Retries {
 
-  it should "run executable" in {
+  override def withFixture(test: NoArgTest): Outcome = {
+    if (isRetryable(test))
+      withRetry { super.withFixture(test) }
+    else
+      super.withFixture(test)
+  }
+
+  it should "run executable" taggedAs Retryable in {
 
     val cmd     = Array("powershell", "-NoProfile")
     val process = new PtyProcessBuilder()
@@ -25,8 +31,8 @@ class PowershellE2ESpec
       .setInitialRows(20)
       .start()
 
-    process.startStdoutGobbler()
-    process.startStderrGobbler()
+    val stdout = process.startStdoutGobbler()
+    val stderr = process.startStderrGobbler()
 
     val setEnv = f"$$env:WORMHOLE_COMMAND=\"${Utils.executable}\""
     val invoke =
@@ -36,10 +42,10 @@ class PowershellE2ESpec
       s"powersession.exe rec \"${Utils.outputDir.resolve("PowershellE2ESpec.txt")}\"",
       hitEnter = true
     )
+    sleep(4000)
+    process.writeToStdinAndFlush(setEnv, hitEnter = true)
     sleep(1000)
-    process.slowType(setEnv)
-    sleep(1000)
-    process.slowType(invoke)
+    process.writeToStdinAndFlush(invoke, hitEnter = true)
     sleep(4000)
     process.slowType("whoami")
     sleep(4000)
@@ -47,7 +53,17 @@ class PowershellE2ESpec
     sleep(1000)
     process.writeToStdinAndFlush("exit", hitEnter = true)
 
-    process.assertProcessTerminatedNormally()
+    try {
+      process.assertProcessTerminatedNormally()
+    } finally {
+      process.destroyForcibly()
+
+      println("OUTPUT:")
+      println(stdout.getCleanOutput)
+      println()
+      println("ERROR:")
+      println(stderr.getCleanOutput)
+    }
 
   }
 
