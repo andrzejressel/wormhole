@@ -1,20 +1,28 @@
 package pl.andrzejressel.wormhole.e2e
 
 import com.pty4j.PtyProcessBuilder
+import org.scalatest.{Outcome, Retries}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
+import org.scalatest.tagobjects.Retryable
 import pl.andrzejressel.wormhole.test_utils.PtyTestOps.{
   ProcessOps,
   PtyProcessOps
 }
 import tags.WindowsOnly
-
 import java.lang.Thread.sleep
 
 @WindowsOnly
-class PowershellE2ESpec extends AnyFlatSpec with should.Matchers {
+class PowershellE2ESpec extends AnyFlatSpec with should.Matchers with Retries {
 
-  it should "run executable" in {
+  override def withFixture(test: NoArgTest): Outcome = {
+    if (isRetryable(test))
+      withRetry { super.withFixture(test) }
+    else
+      super.withFixture(test)
+  }
+
+  it should "run executable" taggedAs Retryable in {
 
     val cmd     = Array("powershell", "-NoProfile")
     val process = new PtyProcessBuilder()
@@ -48,6 +56,8 @@ class PowershellE2ESpec extends AnyFlatSpec with should.Matchers {
     try {
       process.assertProcessTerminatedNormally()
     } finally {
+      process.destroyForcibly()
+
       println("OUTPUT:")
       println(stdout.getCleanOutput)
       println()
