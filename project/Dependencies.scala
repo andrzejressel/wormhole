@@ -1,15 +1,17 @@
 import sbt._
+import sbt.librarymanagement.InclExclRule
+import sbt.librarymanagement.syntax.ExclusionRule
 
 object Dependencies {
 
-  val scalaVersion               = "2.13.8"
+  val scalaVersion               = "3.1.1"
   private val fs2Version         = "3.2.4"
   private val circeVersion       = "0.14.1"
   private val circeFs2Version    = "0.14.0"
   private val catsEffectVersion  = "3.3.4"
   private val enumeratumVersion  = "1.7.0"
   private val refinedVersion     = "0.9.28"
-  private val kittensVersion     = "2.3.2"
+  private val kittensVersion     = "3.0.0-M2"
   private val fs2CronVersion     = "0.7.1"
   private val commonsLangVersion = "3.12.0"
   private val scoptVersion       = "4.0.1"
@@ -31,7 +33,13 @@ object Dependencies {
       "scodec"
     ).map(d => "co.fs2" %% f"fs2-$d" % fs2Version)
 
-    private val cron = "eu.timepit" %% "fs2-cron-cron4s" % fs2CronVersion
+    private val cron = ("eu.timepit" %% "fs2-cron-cron4s" % fs2CronVersion)
+      .cross(CrossVersion.for3Use2_13)
+      .excludeAll(
+        ExclusionRule().withOrganization("org.typelevel"),
+        ExclusionRule().withOrganization("co.fs2"),
+        ExclusionRule().withOrganization("org.scodec")
+      )
 
     val all: Seq[ModuleID] = main :+ cron
   }
@@ -40,15 +48,13 @@ object Dependencies {
     private val main     = Seq(
       "core",
       "generic",
-      "generic-extras",
+//      "generic-extras",
       "parser"
     ).map(d => "io.circe" %% f"circe-$d" % circeVersion)
     private val circeFs2 = "io.circe" %% "circe-fs2" % circeFs2Version
 
     val all: Seq[ModuleID] = main :+ circeFs2
   }
-
-  private val enumeratum = "com.beachape" %% "enumeratum" % enumeratumVersion
 
   private object Refined {
     private val core       = "eu.timepit" %% "refined" % refinedVersion
@@ -109,7 +115,7 @@ object Dependencies {
   private val scopt           = "com.github.scopt" %% "scopt"            % scoptVersion
 
   val all: Seq[ModuleID] =
-    Seq(enumeratum, caseInsensitive, scopt) ++
+    Seq(caseInsensitive, scopt) ++
       FS2.all ++
       Cats.all ++
       Circe.all ++

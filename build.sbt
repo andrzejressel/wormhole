@@ -40,13 +40,8 @@ val commonSettings = Seq(
     "utf8",
     "-deprecation",
     "-unchecked",
-    "-Xlint",
     "-Xfatal-warnings",
-    "-Xlint:-byname-implicit",
-    // "-feature",
-    "-language:implicitConversions",
-    "-Xasync"
-    // ...
+    "-language:implicitConversions"
   ),
   resolvers +=
     "Jetbrains repository" at "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies",
