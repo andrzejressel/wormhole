@@ -3,11 +3,12 @@ package pl.andrzejressel.wormhole.terminal
 import com.pty4j.PtyTest.Gobbler
 import com.pty4j.{PtyProcess, PtyProcessBuilder}
 import io.circe.parser.decode
-import org.scalatest.BeforeAndAfter
 import org.scalatest.EitherValues._
 import org.scalatest.OptionValues._
+import org.scalatest.Outcome
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
+import org.scalatest.tagobjects.Retryable
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.typelevel.ci.CIStringSyntax
 import pl.andrzejressel.wormhole.model.{ChangeDir, ConsoleEvent, SetEnvironment}
@@ -18,20 +19,25 @@ import pl.andrzejressel.wormhole.test_utils.PtyTestOps.{
   ProcessOps,
   PtyProcessOps
 }
-import pl.andrzejressel.wormhole.test_utils.{PromptEventually, WindowsOnly}
+import pl.andrzejressel.wormhole.test_utils.{
+  WindowsOnly,
+  WormholeEventually,
+  WormholeRetries
+}
 
 import java.io.FileInputStream
 import java.nio.file.{Files, Path}
 import java.util.Base64
 import scala.jdk.CollectionConverters._
+import scala.util.Random
 
 class PowershellSpec
     extends AnyFlatSpec
     with should.Matchers
     with ScalaCheckDrivenPropertyChecks
-    with BeforeAndAfter
     with WindowsOnly
-    with PromptEventually {
+    with WormholeEventually
+    with WormholeRetries {
 
   var config: Config       = _
   var startDirectory: Path = _
@@ -39,7 +45,7 @@ class PowershellSpec
   var stdout: Gobbler      = _
   var stderr: Gobbler      = _
 
-  before {
+  override def withFixture(test: NoArgTest): Outcome = retry(test)(() => {
     config = ConfigGenerator.generate(PowerShell)
     startDirectory = Files.createTempDirectory(null)
 
@@ -65,12 +71,12 @@ class PowershellSpec
       hitEnter = true
     )
 
-  }
-
-  after {
-    process.writeToStdinAndFlush("exit", hitEnter = true)
-    process.assertProcessTerminatedNormally()
-  }
+    try super.withFixture(test)
+    finally {
+      process.writeToStdinAndFlush("exit", hitEnter = true)
+      process.assertProcessTerminatedNormally()
+    }
+  })
 
   it should "generate initial info" in {
 
@@ -99,11 +105,10 @@ class PowershellSpec
 
   }
 
-  it should "apply prompt" in {
+  it should "apply prompt" taggedAs Retryable in {
 
     // Wait for Powershell to initialize FileSystemWatcher
-    // TODO: Make it smarter
-    Thread.sleep(5000)
+    Thread.sleep(Random.between(3000, 7000))
 
     Files.writeString(
       config.consolePromptDirectory.resolve("prompt.txt"),
