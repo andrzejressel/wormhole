@@ -7,7 +7,7 @@ import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
 import pl.andrzejressel.wormhole.model.AnsiColor.Black
 import pl.andrzejressel.wormhole.model.ConsoleState
-import pl.andrzejressel.wormhole.utils.PromptEventually
+import pl.andrzejressel.wormhole.test_utils.PromptEventually
 
 import java.time.{Duration, Instant}
 
@@ -42,12 +42,5 @@ class CurrentTimeModuleSpec
       Seq(4, 5, 6) should contain(durationInSeconds)
     }
   }
-
-//  @inline
-//  private def eventuallyAsync[A](
-//    body: => A
-//  )(implicit F: cats.effect.kernel.Async[IO]): IO[A] = eventually {
-//    async[IO](body)
-//  }
 
 }

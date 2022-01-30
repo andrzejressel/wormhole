@@ -1,10 +1,11 @@
-package pl.andrzejressel.wormhole.utils
+package pl.andrzejressel.wormhole.test_utils
 
 import com.sun.jna.platform.win32.WinDef.DWORD
 import org.apache.commons.lang3.SystemUtils
 import org.scalactic.source
 import org.scalatest.{BeforeAndAfter, Outcome, TestSuite}
-import pl.andrzejressel.wormhole.utils.ScalaTestOps.assumeWindows
+import pl.andrzejressel.wormhole.test_utils.ScalaTestOps.assumeWindows
+import pl.andrzejressel.wormhole.utils.FileApi
 
 import java.nio.file.Path
 

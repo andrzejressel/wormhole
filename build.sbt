@@ -9,7 +9,7 @@ scalaVersion := Dependencies.scalaVersion
 val commonSettings = Seq(
   version           := "0.1.0-SNAPSHOT",
   // Locked by https://github.com/circe/circe-generic-extras/issues/168
-  scalaVersion      := Dependencies.scalaVersion,   // 2.11.12, 2.13.7, or 3.x
+  scalaVersion      := Dependencies.scalaVersion,
   semanticdbEnabled := true,                        // enable SemanticDB
   semanticdbVersion := scalafixSemanticdb.revision, // only required for Scala 2.x
   scalacOptions     := Seq(
@@ -45,6 +45,7 @@ lazy val root = (project in file("."))
 
 lazy val core = (project in file("modules/core"))
   .enablePlugins(NativeImagePlugin)
+  .dependsOn(testUtils % Test)
   .settings(
     commonSettings,
     name := "core",
@@ -69,4 +70,20 @@ lazy val resourceTest = (project in file("modules/resource_test"))
     nativeImageSettings,
     name      := "resource_test",
     mainClass := Some("pl.andrzejressel.wormhole.resource_test.Main")
+  )
+
+lazy val testUtils = (project in file("modules/test_utils"))
+  .settings(
+    commonSettings,
+    name := "test_utils",
+    libraryDependencies ++= Dependencies.all.map(
+      _.withConfigurations(None) % Compile
+    )
+  )
+
+lazy val e2e = (project in file("modules/e2e"))
+  .dependsOn(testUtils % Test)
+  .settings(
+    commonSettings,
+    name := "e2e"
   )

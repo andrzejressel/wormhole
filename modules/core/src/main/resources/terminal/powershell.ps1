@@ -122,6 +122,6 @@ $null = Register-ObjectEvent $Watcher -EventName Changed -SourceIdentifier Promp
    }
 }
 
-if ($global:wormholeCommand -ne "") {
+if ($global:wormholeCommand -ne "none") {
     Start-Process -FilePath "$global:wormholeCommand" -ArgumentList "start", "-t", "Powershell", "--console_events_path", "$global:eventsDir", "--console_prompt_path", "$global:promptDir"
 }

@@ -1,4 +1,4 @@
-package pl.andrzejressel.wormhole.utils
+package pl.andrzejressel.wormhole.test_utils
 
 import com.pty4j.PtyTest.Gobbler
 import com.pty4j.{PtyProcess, PtyTest}
@@ -15,5 +15,14 @@ object PtyTestOps {
 
     def startStdoutGobbler(): Gobbler = PtyTest.startStdoutGobbler(process)
     def startStderrGobbler(): Gobbler = PtyTest.startStderrGobbler(process)
+
+    def slowType(text: String): Unit = {
+      for (c <- text) {
+        writeToStdinAndFlush(Character.toString(c), hitEnter = false)
+        Thread.sleep(100)
+      }
+      writeToStdinAndFlush("", hitEnter = true)
+    }
+
   }
 }

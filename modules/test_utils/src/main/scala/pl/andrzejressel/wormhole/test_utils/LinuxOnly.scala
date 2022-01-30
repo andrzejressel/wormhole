@@ -1,9 +1,9 @@
-package pl.andrzejressel.wormhole.utils
+package pl.andrzejressel.wormhole.test_utils
 
 import org.apache.commons.lang3.SystemUtils
 import org.scalactic.source
 import org.scalatest.{BeforeAndAfter, Outcome, TestSuite}
-import pl.andrzejressel.wormhole.utils.ScalaTestOps.assumeLinux
+import pl.andrzejressel.wormhole.test_utils.ScalaTestOps.assumeLinux
 
 trait LinuxOnly extends TestSuite with BeforeAndAfter {
   override protected def withFixture(test: NoArgTest): Outcome = {
