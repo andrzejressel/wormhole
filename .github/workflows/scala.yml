@@ -13,8 +13,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
+            test_args: -l tags.MacOnly -l tags.WindowsOnly
           - os: windows-latest
+            test_args: -l tags.MacOnly -l tags.LinuxOnly
           - os: macos-latest
+            test_args: -l tags.LinuxOnly -l tags.WindowsOnly
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -28,7 +31,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     - name: Run tests
-      run: sbt coverage test coverageReport
+      run: sbt coverage "testOnly * -- ${{ matrix.test_args }}" coverageReport
     - uses: codecov/codecov-action@v2
 
   native_image:

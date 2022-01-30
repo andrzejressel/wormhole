@@ -15,12 +15,12 @@ import pl.andrzejressel.wormhole.model.{ChangeDir, ConsoleEvent, SetEnvironment}
 import pl.andrzejressel.wormhole.service.ConfigGenerator
 import pl.andrzejressel.wormhole.service.ConfigGenerator.Config
 import pl.andrzejressel.wormhole.terminal.Terminal.PowerShell
+import pl.andrzejressel.wormhole.test_utils.PathOps.WindowsPath
 import pl.andrzejressel.wormhole.test_utils.PtyTestOps.{
   ProcessOps,
   PtyProcessOps
 }
 import pl.andrzejressel.wormhole.test_utils.{
-  WindowsOnly,
   WormholeEventually,
   WormholeRetries
 }
@@ -31,11 +31,11 @@ import java.util.Base64
 import scala.jdk.CollectionConverters._
 import scala.util.Random
 
+@tags.WindowsOnly
 class PowershellSpec
     extends AnyFlatSpec
     with should.Matchers
     with ScalaCheckDrivenPropertyChecks
-    with WindowsOnly
     with WormholeEventually
     with WormholeRetries {
 
