@@ -35,9 +35,9 @@ class PowershellE2ESpec extends AnyFlatSpec with should.Matchers {
       hitEnter = true
     )
     sleep(1000)
-    process.slowType(setEnv)
+    process.writeToStdinAndFlush(setEnv, hitEnter = true)
     sleep(1000)
-    process.slowType(invoke)
+    process.writeToStdinAndFlush(invoke, hitEnter = true)
     sleep(4000)
     process.slowType("whoami")
     sleep(4000)
