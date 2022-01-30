@@ -21,5 +21,4 @@ trait WormholeRetries extends Retries { self: TestSuite =>
       case other                   => other
     }
   }
-
 }
