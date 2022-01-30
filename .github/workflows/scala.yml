@@ -34,7 +34,7 @@ jobs:
       run: sbt coverage test coverageReport
     - uses: codecov/codecov-action@v2
     - name: Publish Results to Testspace
-      run: testspace [${{ matrix.os}}]./modules/core/target/test-reports/*.xml
+      run: testspace [${{ matrix.os}}]./modules/core/target/test-reports/*.xml [${{ matrix.os}}]./modules/core/target/scala-2.13/coverage-report/*.xml
 
   native_image:
     strategy:
