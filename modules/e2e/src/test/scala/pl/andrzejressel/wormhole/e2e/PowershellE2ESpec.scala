@@ -7,14 +7,12 @@ import pl.andrzejressel.wormhole.test_utils.PtyTestOps.{
   ProcessOps,
   PtyProcessOps
 }
-import pl.andrzejressel.wormhole.test_utils.WindowsOnly
+import tags.WindowsOnly
 
 import java.lang.Thread.sleep
 
-class PowershellE2ESpec
-    extends AnyFlatSpec
-    with should.Matchers
-    with WindowsOnly {
+@WindowsOnly
+class PowershellE2ESpec extends AnyFlatSpec with should.Matchers {
 
   it should "run executable" in {
 
