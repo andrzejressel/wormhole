@@ -23,8 +23,8 @@ class PowershellE2ESpec extends AnyFlatSpec with should.Matchers {
       .setInitialRows(20)
       .start()
 
-    process.startStdoutGobbler()
-    process.startStderrGobbler()
+    val stdout = process.startStdoutGobbler()
+    val stderr = process.startStderrGobbler()
 
     val setEnv = f"$$env:WORMHOLE_COMMAND=\"${Utils.executable}\""
     val invoke =
@@ -45,7 +45,15 @@ class PowershellE2ESpec extends AnyFlatSpec with should.Matchers {
     sleep(1000)
     process.writeToStdinAndFlush("exit", hitEnter = true)
 
-    process.assertProcessTerminatedNormally()
+    try {
+      process.assertProcessTerminatedNormally()
+    } finally {
+      println("OUTPUT:")
+      println(stdout.getCleanOutput)
+      println()
+      println("ERROR:")
+      println(stderr.getCleanOutput)
+    }
 
   }
 
