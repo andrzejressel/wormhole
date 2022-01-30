@@ -1,4 +1,4 @@
-package pl.andrzejressel.wormhole.utils
+package pl.andrzejressel.wormhole.test_utils
 
 import org.apache.commons.lang3.SystemUtils
 import org.scalatest.{Assertion, Assertions}

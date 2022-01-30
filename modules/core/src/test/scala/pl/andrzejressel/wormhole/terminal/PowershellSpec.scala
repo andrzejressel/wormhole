@@ -14,8 +14,11 @@ import pl.andrzejressel.wormhole.model.{ChangeDir, ConsoleEvent, SetEnvironment}
 import pl.andrzejressel.wormhole.service.ConfigGenerator
 import pl.andrzejressel.wormhole.service.ConfigGenerator.Config
 import pl.andrzejressel.wormhole.terminal.Terminal.PowerShell
-import pl.andrzejressel.wormhole.utils.PtyTestOps._
-import pl.andrzejressel.wormhole.utils.{PromptEventually, WindowsOnly}
+import pl.andrzejressel.wormhole.test_utils.PtyTestOps.{
+  ProcessOps,
+  PtyProcessOps
+}
+import pl.andrzejressel.wormhole.test_utils.{PromptEventually, WindowsOnly}
 
 import java.io.FileInputStream
 import java.nio.file.{Files, Path}
@@ -45,7 +48,7 @@ class PowershellSpec
     Files.writeString(config.consolePromptDirectory.resolve("prompt.txt"), "")
 
     val env    = System.getenv.asScala.to(Map)
-    val newEnv = env + ("WORMHOLE_COMMAND" -> "")
+    val newEnv = env + ("WORMHOLE_COMMAND" -> "none")
 
     val cmd = Array("powershell", "-NoProfile")
     process = new PtyProcessBuilder()

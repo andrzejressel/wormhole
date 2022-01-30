@@ -9,7 +9,6 @@ import org.scalatest.matchers.should
 import org.typelevel.ci.CIStringSyntax
 import pl.andrzejressel.wormhole.model.AnsiColor.Black
 import pl.andrzejressel.wormhole.model.{ConsoleState, Segment}
-import pl.andrzejressel.wormhole.utils.PromptEventually
 
 import java.nio.file.Paths
 import java.util.concurrent.atomic.AtomicInteger
@@ -17,10 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger
 class FunctionModuleSpec
     extends AsyncFlatSpec
     with should.Matchers
-    with AsyncIOSpec
-    with PromptEventually {
+    with AsyncIOSpec {
 
-  it should "handle duplicates at input" in {
+  it should "handle duplicates at input" in async[IO] {
 
     val createSegmentInvocations = new AtomicInteger(0)
 
@@ -37,10 +35,8 @@ class FunctionModuleSpec
       }
     }
 
-    for {
-      _ <- csStream.through(module.getModulePipe).compile.drain
-      _ <- IO(createSegmentInvocations).asserting(_.get() shouldBe 3)
-    } yield ()
+    csStream.through(module.getModulePipe).compile.drain.await
+    createSegmentInvocations.get() shouldBe 3
   }
 
   it should "handle duplicates at output" in async[IO] {

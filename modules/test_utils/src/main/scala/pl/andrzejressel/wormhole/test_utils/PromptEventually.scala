@@ -1,4 +1,4 @@
-package pl.andrzejressel.wormhole.utils
+package pl.andrzejressel.wormhole.test_utils
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Seconds, Span}

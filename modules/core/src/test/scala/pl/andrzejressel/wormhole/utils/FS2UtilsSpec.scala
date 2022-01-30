@@ -5,6 +5,7 @@ import cats.effect.testing.scalatest.AsyncIOSpec
 import fs2.Pipe
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.should
+import pl.andrzejressel.wormhole.test_utils.PromptEventually
 import pl.andrzejressel.wormhole.utils.FS2Utils.{
   prefetchKeepLatest,
   shareAndCombine
